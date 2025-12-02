@@ -2,6 +2,7 @@
 name = "TasKanLine"
 version = "0.1.0"
 description = "Add your description here"
+author = ["Yernaz Kenesbekov <yernazkenesbekov24@gmail.com>"]
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -11,4 +12,11 @@ dependencies = [
     "uvicorn>=0.38.0",
     "sqlalchemy[asyncio]>=2.0.44",
     "asyncpg>=0.31.0",
+    "aiosqlite>=0.21.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.6",
+    "ty>=0.0.1a28",
 ]

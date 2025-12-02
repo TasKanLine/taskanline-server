@@ -1,9 +1,6 @@
-from sqlite3.dbapi2 import SQLITE_ABORT
-from urllib.parse import quote
-
-from pydantic_core.core_schema import ComputedField
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel
+
 
 class Core(BaseModel):
     HOST: str = "localhost"
@@ -11,13 +8,12 @@ class Core(BaseModel):
 
 
 class PostgresConfig(BaseModel):
-    HOST: str = "localhost"
-    PORT: int = 5432
+    HOST: str | None = None
+    PORT: int | None = None
     USER: str = "postgres"
     PASSWORD: str = "password"
     DATABASE: str = "database"
 
-    @computed_field
     def url(self) -> str:
         u = self.USER
         p = self.PASSWORD
@@ -25,16 +21,20 @@ class PostgresConfig(BaseModel):
 
 
 class SQLiteSettings(BaseModel):
-    DATABASE: str = "database.sqlite"
+    DATABASE: str = "database/db.sqlite3"
 
-    @computed_field
     def url(self) -> str:
-        return f"sqlite:///{self.DATABASE}"
+        return f"sqlite+aiosqlite:///{self.DATABASE}"
 
 
 class Settings(BaseSettings):
-    code: Core
-    db: PostgresConfig
-    db_test: SQLiteSettings
+    core: Core = Core()
+    db: PostgresConfig = PostgresConfig()
+    db_test: SQLiteSettings = SQLiteSettings()
 
-    model_config = SettingsConfigDict(env_file=".env", env_nested_delimiter="__", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(
+        env_file=".env", env_nested_delimiter="__", env_file_encoding="utf-8"
+    )
+
+
+settings = Settings()
