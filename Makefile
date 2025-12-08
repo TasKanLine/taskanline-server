@@ -2,23 +2,27 @@
 .PHONY: run build build-run update-app clean
 
 # Локальный запуск через uv
-start:
+dev:
 	uv sync
 	uv run src/main.py
 
 # Сборка образа
 build:
+	uv pip freeze > requirements.txt
 	docker build -t backend-taskanline .
 
 # Сборка + Запуск (зависит от build)
 build-run: build
-	docker run -d -p 8000:8000 --env-file ./.env --name some-backend-taskanline backend-taskanline
+	docker run -p 8000:8000 --name some-backend-taskanline  -v "$(pwd):/app/" -d backend-taskanline
 
 run:
+	docker run -p 8000:8000 --name some-backend-taskanline  -v "$(pwd):/app/" -d backend-taskanline
+
+start:
 	docker start some-backend-taskanline
 
 stop:
-	docker stop some-backend-taskanline
+	-docker stop some-backend-taskanline
 
 # Полное обновление: снос старого -> сборка -> запуск нового
 # Мы просто вызываем другие цели по цепочке
