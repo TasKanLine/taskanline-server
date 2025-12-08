@@ -13,6 +13,7 @@ dependencies = [
     "sqlalchemy[asyncio]>=2.0.44",
     "asyncpg>=0.31.0",
     "aiosqlite>=0.21.0",
+    "argon2-cffi>=25.1.0",
 ]
 
 [dependency-groups]

@@ -12,7 +12,7 @@ build:
 
 # Сборка + Запуск (зависит от build)
 build-run: build
-	docker run -d -p 8000:8000 --env-file ./.env -v taskanline_db:/app/database/ --name some-backend-taskanline backend-taskanline
+	docker run -d -p 8000:8000 --env-file ./.env --name some-backend-taskanline backend-taskanline
 
 run:
 	docker start some-backend-taskanline

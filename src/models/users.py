@@ -12,10 +12,13 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     email: Mapped[str] = mapped_column(String, unique=True, index=True)
     username: Mapped[str] = mapped_column(String(30), unique=True, index=True)
-    hashed_password = Column(String)
+    password = Column(String)
     is_admin = Column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, default=datetime.now)
-    updated_at: Mapped[datetime] = mapped_column(TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP, default=datetime.now, onupdate=datetime.now
+    )
+
 
 class UserProfile(Base):
     __tablename__ = "user_profiles"
@@ -29,4 +32,6 @@ class UserProfile(Base):
     gender: Mapped[str] = mapped_column(String(10), nullable=True)
     avatar: Mapped[str] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, default=datetime.now)
-    updated_at: Mapped[datetime] = mapped_column(TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP, default=datetime.now, onupdate=datetime.now
+    )

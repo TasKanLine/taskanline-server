@@ -4,7 +4,7 @@ from sqlalchemy.orm import DeclarativeBase
 from core.config import settings
 
 
-if settings.db.HOST != None:
+if settings.db.HOST:
     DATABASE = settings.db.url()
 else:
     DATABASE = settings.db_test.url()
