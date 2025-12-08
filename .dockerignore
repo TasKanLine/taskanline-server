@@ -1,0 +1,19 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.ruff_cache
+.venv
+uv.lock
+
+.git
+.gitignore
+
+.python-version
+Makefile
+pyproject.toml
+README.md
+test.py
