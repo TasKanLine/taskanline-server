@@ -17,7 +17,7 @@ class PostgresConfig(BaseModel):
     def url(self) -> str:
         u = self.USER
         p = self.PASSWORD
-        return f"postgresql://{u}:{p}@{self.HOST}:{self.PORT}/{self.DATABASE}"
+        return f"postgresql+asyncpg://{u}:{p}@{self.HOST}:{self.PORT}/{self.DATABASE}"
 
 
 class SQLiteSettings(BaseModel):
