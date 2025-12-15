@@ -2,9 +2,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import BaseModel
 
 
+from typing import List
+
 class Core(BaseModel):
     HOST: str = "localhost"
     PORT: int = 8000
+    ALLOWED_ORIGINS: List[str] = ["*"]
 
 
 class PostgresConfig(BaseModel):
