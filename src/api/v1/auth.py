@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Response, Depends
 from sqlalchemy.exc import IntegrityError
 
-from core.depends import AsyncSessionDep, SecurityDep
+from core.depends import AsyncSessionDep, SecurityDep, get_current_user
 from core.security import security
 from crud import auth as crud
 from schemas import auth as schemas
@@ -27,7 +27,9 @@ async def signup(session: AsyncSessionDep, user: schemas.UserCreate):
 
 
 @router.post("/login", response_model=schemas.UserModel)
-async def login(session: AsyncSessionDep, user_data: schemas.UserLogin, response: Response):
+async def login(
+    session: AsyncSessionDep, user_data: schemas.UserLogin, response: Response
+):
     if not user_data.email:
         raise HTTPException(status_code=400, detail="Email or username is required")
     if not user_data.password:
@@ -38,7 +40,9 @@ async def login(session: AsyncSessionDep, user_data: schemas.UserLogin, response
         )
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        token = security.create_access_token(uid=str(user.id), dict={"email": user.email, "username": user.username})
+        token = security.create_access_token(
+            uid=str(user.id), dict={"email": user.email, "username": user.username}
+        )
         response.set_cookie(key="access_token", value=token)
         return schemas.UserModel(id=user.id, email=user.email, username=user.username)
     except IntegrityError:
@@ -46,8 +50,5 @@ async def login(session: AsyncSessionDep, user_data: schemas.UserLogin, response
 
 
 @router.get("/protected")
-async def protected(user: str = SecurityDep):
-    try:
-        return {"message": "You are authorized"}
-    except:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+async def protected(user: str = Depends(get_current_user)):
+    return {"message": "You are authorized"}
