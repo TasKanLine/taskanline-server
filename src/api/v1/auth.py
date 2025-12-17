@@ -17,10 +17,14 @@ async def signup(session: AsyncSessionDep, user: schemas.UserCreate):
         raise HTTPException(status_code=400, detail="Email is required")
     if not user.username:
         raise HTTPException(status_code=400, detail="Username is required")
+    if not user.first_name:
+        raise HTTPException(status_code=400, detail="First name is required")
+    if not user.last_name:
+        raise HTTPException(status_code=400, detail="Last name is required")
     try:
         await crud.create_user(session, user)
         return schemas.UserResponse(
-            status="User created successfully", email=user.email, username=user.username
+            status="User created successfully", email=user.email, username=user.username, first_name=user.first_name, last_name=user.last_name
         )
     except IntegrityError:
         raise HTTPException(status_code=409, detail="Email or username already exists")

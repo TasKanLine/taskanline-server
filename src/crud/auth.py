@@ -3,7 +3,7 @@ from sqlalchemy import select
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
-from models.users import User
+from models.users import User, UserProfile
 from schemas.auth import UserCreate
 
 ph = PasswordHasher()
@@ -16,6 +16,16 @@ async def create_user(session: AsyncSession, user_data: UserCreate) -> User:
         username=user_data.username,
     )
     session.add(user)
+    await session.flush()
+    await session.refresh(user)
+    user_profile = UserProfile(
+        user_id=user.id,
+        first_name=user_data.first_name,
+        last_name=user_data.last_name,
+    )
+    session.add(user_profile)
+    await session.flush()
+    await session.refresh(user_profile)
     await session.commit()
     return user
 
