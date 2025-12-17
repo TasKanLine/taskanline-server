@@ -1,3 +1,4 @@
+from urllib.parse import quote
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import BaseModel
 
@@ -8,6 +9,7 @@ class Core(BaseModel):
     HOST: str = "localhost"
     PORT: int = 8000
     ALLOWED_ORIGINS: List[str] = ["*"]
+    JWT_SECRET_KEY: str = "secret"
 
 
 class PostgresConfig(BaseModel):
@@ -18,8 +20,8 @@ class PostgresConfig(BaseModel):
     DATABASE: str = "database"
 
     def url(self) -> str:
-        u = self.USER
-        p = self.PASSWORD
+        u = quote(self.USER)
+        p = quote(self.PASSWORD)
         return f"postgresql+asyncpg://{u}:{p}@{self.HOST}:{self.PORT}/{self.DATABASE}"
 
 

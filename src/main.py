@@ -32,4 +32,4 @@ async def root():
 
 if __name__ == "__main__":
     asyncio.run(setup_database())
-    uvicorn.run(app, host=HOST, port=PORT, reload=True)
+    uvicorn.run("main:app", host=HOST, port=PORT)
