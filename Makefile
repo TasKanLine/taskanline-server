@@ -11,12 +11,11 @@ build:
 	uv pip freeze > requirements.txt
 	docker build -t backend-taskanline .
 
-# Сборка + Запуск (зависит от build)
-build-run: build
-	docker run -p 8000:8000 --name some-backend-taskanline  -v "$(pwd):/app/" -d backend-taskanline
-
 run:
-	docker run -p 8000:8000 --name some-backend-taskanline  -v "$(pwd):/app/" -d backend-taskanline
+	docker run -p 8000:8000 --name some-backend-taskanline -v "$pwd:/app" -d backend-taskanline
+
+build-run: build
+	docker run -p 8000:8000 --name some-backend-taskanline -v "$pwd:/app" -d backend-taskanline
 
 start:
 	docker start some-backend-taskanline
