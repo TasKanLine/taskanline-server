@@ -12,10 +12,10 @@ build:
 	docker build -t backend-taskanline .
 
 run:
-	docker run -p 8000:8000 --name some-backend-taskanline -v "$pwd:/app" -d backend-taskanline
+	docker run -p 8000:8000 --name some-backend-taskanline -d backend-taskanline
 
 build-run: build
-	docker run -p 8000:8000 --name some-backend-taskanline -v "$pwd:/app" -d backend-taskanline
+	docker run -p 8000:8000 --name some-backend-taskanline -d backend-taskanline
 
 start:
 	docker start some-backend-taskanline
