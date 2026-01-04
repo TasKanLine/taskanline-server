@@ -4,7 +4,7 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
 from models.users import User, UserProfile
-from schemas.auth import UserCreate
+from schemas.auth import UserCreate, UserResponse
 
 ph = PasswordHasher()
 
@@ -64,3 +64,40 @@ async def get_user_by_email(session: AsyncSession, email: str) -> User | None:
 
 async def get_user_by_username(session: AsyncSession, username: str) -> User | None:
     return await session.scalar(select(User).where(User.username == username))
+
+
+async def get_user_by_username_or_email(
+    session: AsyncSession, username_or_email: str
+) -> User | None:
+    return await session.scalar(
+        select(User)
+        .where(User.username == username_or_email)
+        .union_all(select(User).where(User.email == username_or_email))
+    )
+
+
+async def get_user_profile_by_username(
+    session: AsyncSession, username: str
+) -> UserResponse | None:
+    user = await get_user_by_username(session, username)
+    if user:
+        user_profile = await session.get(UserProfile, user.id)
+        return UserResponse(
+            email=user.email,
+            username=user.username,
+            first_name=user_profile.first_name,
+            last_name=user_profile.last_name,
+            birth_date=user_profile.birth_date,
+            phone_number=user_profile.phone_number,
+            avatar_url=user_profile.avatar,
+        )
+    return None
+
+
+async def get_user_profile_by_username_or_email(
+    session: AsyncSession, username_or_email: str
+) -> UserProfile | None:
+    user = await get_user_by_username_or_email(session, username_or_email)
+    if user:
+        return await session.get(UserProfile, user.id)
+    return None

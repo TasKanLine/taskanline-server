@@ -1,3 +1,4 @@
+import datetime
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -25,12 +26,13 @@ class UserLogin(BaseModel):
 
 
 class UserResponse(BaseModel):
-    status: str = Field(..., description="Response message")
     email: EmailStr = Field(..., description="User's email address")
     username: str = Field(..., description="User's username")
     first_name: str = Field(..., description="User's first name")
     last_name: str = Field(..., description="User's last name")
-
+    birth_date: datetime.date | None = Field(..., description="User's birth date")
+    phone_number: str | None = Field(..., description="User's phone number")
+    avatar_url: str | None = Field(..., description="User's avatar URL")
 
 
 class UserModel(BaseModel):

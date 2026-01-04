@@ -22,4 +22,4 @@ async def get_current_user(request: Request):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
 
-SecurityDep = Annotated[str, Depends(get_current_user)]
+SecurityDep = Annotated[dict, Depends(get_current_user)]

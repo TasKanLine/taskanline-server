@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 from typing import List
 
+
 class Core(BaseModel):
     HOST: str = "localhost"
     PORT: int = 8000

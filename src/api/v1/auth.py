@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Response, Depends
 from sqlalchemy.exc import IntegrityError
 
-from core.depends import AsyncSessionDep, SecurityDep, get_current_user
+from core.depends import AsyncSessionDep, SecurityDep
 from core.security import security
 from crud import auth as crud
 from schemas import auth as schemas
@@ -24,7 +24,11 @@ async def signup(session: AsyncSessionDep, user: schemas.UserCreate):
     try:
         await crud.create_user(session, user)
         return schemas.UserResponse(
-            status="User created successfully", email=user.email, username=user.username, first_name=user.first_name, last_name=user.last_name
+            status="User created successfully",
+            email=user.email,
+            username=user.username,
+            first_name=user.first_name,
+            last_name=user.last_name,
         )
     except IntegrityError:
         raise HTTPException(status_code=409, detail="Email or username already exists")
@@ -45,7 +49,8 @@ async def login(
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         token = security.create_access_token(
-            uid=str(user.id), dict={"email": user.email, "username": user.username}
+            uid=str(user.username),
+            dict={"email": user.email, "username": user.username},
         )
         response.set_cookie(key="access_token", value=token)
         return schemas.UserModel(id=user.id, email=user.email, username=user.username)
@@ -53,6 +58,8 @@ async def login(
         raise HTTPException(status_code=409, detail="Email or username already exists")
 
 
-@router.get("/protected")
-async def protected(user: str = Depends(get_current_user)):
-    return {"message": "You are authorized"}
+@router.get("/me")
+async def protected(user: SecurityDep, session: AsyncSessionDep):
+    username = user.sub
+    user_data = await crud.get_user_profile_by_username(session, username)
+    return {"message": "You are authorized", "user_data": user_data}
