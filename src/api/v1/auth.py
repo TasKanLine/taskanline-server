@@ -24,11 +24,13 @@ async def signup(session: AsyncSessionDep, user: schemas.UserCreate):
     try:
         await crud.create_user(session, user)
         return schemas.UserResponse(
-            status="User created successfully",
             email=user.email,
             username=user.username,
             first_name=user.first_name,
             last_name=user.last_name,
+            birth_date=None,
+            phone_number=None,
+            avatar_url=None,
         )
     except IntegrityError:
         raise HTTPException(status_code=409, detail="Email or username already exists")
@@ -60,6 +62,15 @@ async def login(
 
 @router.get("/me")
 async def protected(user: SecurityDep, session: AsyncSessionDep):
-    username = user.sub
-    user_data = await crud.get_user_profile_by_username(session, username)
+    try:
+        username = user.sub
+        user_data = await crud.get_user_profile_by_username(session, username)
+    except TypeError:
+        raise HTTPException(status_code=401, detail="Unauthorized")
     return {"message": "You are authorized", "user_data": user_data}
+
+
+@router.post("/logout")
+async def logout(response: Response):
+    response.delete_cookie(key="access_token")
+    return {"message": "Successfully logged out"}
