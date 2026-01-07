@@ -54,7 +54,7 @@ async def login(
             uid=str(user.username),
             dict={"email": user.email, "username": user.username},
         )
-        response.set_cookie(key="access_token", value=token)
+        response.set_cookie(key="access_token", value=token, samesite="none", secure=True)
         return schemas.UserModel(id=user.id, email=user.email, username=user.username)
     except IntegrityError:
         raise HTTPException(status_code=409, detail="Email or username already exists")
