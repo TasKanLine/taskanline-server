@@ -63,7 +63,7 @@ async def login(
 @router.get("/me")
 async def protected(user: SecurityDep, session: AsyncSessionDep):
     try:
-        username = user.sub
+        username = user.sub  # pyright: ignore[reportAttributeAccessIssue]
         user_data = await crud.get_user_profile_by_username(session, username)
     except TypeError:
         raise HTTPException(status_code=401, detail="Unauthorized")

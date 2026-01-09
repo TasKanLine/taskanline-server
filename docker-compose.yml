@@ -1,0 +1,26 @@
+version: "3.7"
+
+services:
+  taskanline-server:
+    build: .
+    container_name: taskanline-server
+    ports:
+      - "8000:8000"
+    environment:
+      - DB__HOST=${DB__HOST}
+      - DB__PORT=${DB__PORT}
+      - DB__USER=${DB__USER}
+      - DB__PASSWORD=${DB__PASSWORD}
+      - DB__DATABASE=${DB__DATABASE}
+      - CORE__HOST=${CORE__HOST}
+      - CORE__PORT=${CORE__PORT}
+      - CORE__ALLOWED_ORIGINS=${CORE__ALLOWED_ORIGINS}
+      - CORE__JWT_SECRET_KEY=${CORE__JWT_SECRET_KEY}
+    depends_on:
+      - postgres-some
+    restart: on-failure
+
+networks:
+  taskanline-server-network:
+    driver: bridge
+    external: true

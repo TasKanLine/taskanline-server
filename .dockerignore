@@ -12,6 +12,7 @@ uv.lock
 .git
 .gitignore
 
+.env
 .python-version
 Makefile
 pyproject.toml
