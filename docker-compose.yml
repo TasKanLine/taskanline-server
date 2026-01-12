@@ -17,8 +17,12 @@ services:
       - CORE__ALLOWED_ORIGINS=${CORE__ALLOWED_ORIGINS}
       - CORE__JWT_SECRET_KEY=${CORE__JWT_SECRET_KEY}
     restart: on-failure
+    networks:
+      - taskanline-server-network
+      - taskanline-client-network
 
 networks:
   taskanline-server-network:
-    driver: bridge
+    external: true
+  taskanline-client-network:
     external: true
