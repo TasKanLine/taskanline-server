@@ -1,9 +1,9 @@
 version: "3.7"
 
 services:
-  taskanline-server:
+  taskanline_server:
     build: .
-    container_name: taskanline-server
+    container_name: taskanline_server
     ports:
       - "8000:8000"
     environment:
