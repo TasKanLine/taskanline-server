@@ -87,7 +87,7 @@ async def get_user_profile_by_username(
             username=user.username,
             first_name=user_profile.first_name,
             last_name=user_profile.last_name,
-            birth_date=user_profile.birth_date,
+            # birth_date=user_profile.birth_date,
             phone_number=user_profile.phone_number,
             avatar_url=user_profile.avatar,
         )

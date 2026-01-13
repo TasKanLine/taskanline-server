@@ -30,7 +30,7 @@ class UserResponse(BaseModel):
     username: str = Field(..., description="User's username")
     first_name: str = Field(..., description="User's first name")
     last_name: str = Field(..., description="User's last name")
-    birth_date: datetime.date | None = Field(..., description="User's birth date")
+    # birth_date: datetime.date | None = Field(..., description="User's birth date")
     phone_number: str | None = Field(..., description="User's phone number")
     avatar_url: str | None = Field(..., description="User's avatar URL")
 
