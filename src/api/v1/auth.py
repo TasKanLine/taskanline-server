@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException, Response, Depends
+import logging
+
+from fastapi import APIRouter, HTTPException, Response, Request
 from sqlalchemy.exc import IntegrityError
 
 from core.depends import AsyncSessionDep, SecurityDep
@@ -8,6 +10,8 @@ from schemas import auth as schemas
 from models import users
 
 
+logging.basicConfig(level=logging.NOTSET)
+# log = logging.getLogger(name=__name__)
 router = APIRouter(prefix="/auth")
 
 
@@ -38,8 +42,10 @@ async def signup(session: AsyncSessionDep, user: schemas.UserCreate):
 
 @router.post("/login", response_model=schemas.UserModel)
 async def login(
-    session: AsyncSessionDep, user_data: schemas.UserLogin, response: Response
+    session: AsyncSessionDep, user_data: schemas.UserLogin, response: Response, r: Request
 ):
+    logging.info(r.url)
+    print(r.url)
     if not user_data.email:
         raise HTTPException(status_code=400, detail="Email or username is required")
     if not user_data.password:
@@ -61,7 +67,7 @@ async def login(
 
 
 @router.get("/me")
-async def protected(user: SecurityDep, session: AsyncSessionDep):
+async def protected(user: SecurityDep, session: AsyncSessionDep, response: Response):
     try:
         username = user.sub  # pyright: ignore[reportAttributeAccessIssue]
         user_data = await crud.get_user_profile_by_username(session, username)
