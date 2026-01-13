@@ -1,6 +1,6 @@
 from datetime import datetime, UTC
 
-from sqlalchemy import Column, String, Boolean, TIMESTAMP, ForeignKey, Date
+from sqlalchemy import Column, String, Boolean, ForeignKey, Datetime, Date
 from sqlalchemy.orm import Mapped, mapped_column
 
 from database.session import Base
@@ -14,9 +14,9 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(30), unique=True, index=True)
     password = Column(String)
     is_admin = Column(Boolean, default=False)
-    created_at: Mapped[datetime] = mapped_column(TIMESTAMP, default=lambda: datetime.now(UTC))
-    updated_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
+    created_at: Mapped[Datetime] = mapped_column(Datetime, default=datetime.now)
+    updated_at: Mapped[Datetime] = mapped_column(
+        Datetime, default=datetime.now, onupdate=datetime.now
     )
 
 
@@ -31,7 +31,7 @@ class UserProfile(Base):
     phone_number: Mapped[str] = mapped_column(String(10), nullable=True)
     gender: Mapped[str] = mapped_column(String(10), nullable=True)
     avatar: Mapped[str] = mapped_column(String(255), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(TIMESTAMP, default=lambda: datetime.now(UTC))
-    updated_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
+    created_at: Mapped[Datetime] = mapped_column(Datetime, default=datetime.now)
+    updated_at: Mapped[Datetime] = mapped_column(
+        Datetime, default=datetime.now, onupdate=datetime.now
     )
