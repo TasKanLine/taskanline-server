@@ -16,7 +16,7 @@ services:
       - CORE__PORT=${CORE__PORT}
       - CORE__ALLOWED_ORIGINS=${CORE__ALLOWED_ORIGINS}
       - CORE__JWT_SECRET_KEY=${CORE__JWT_SECRET_KEY}
-    restart: on-failure
+    restart: always
     networks:
       - taskanline-server-network
       - taskanline-client-network
