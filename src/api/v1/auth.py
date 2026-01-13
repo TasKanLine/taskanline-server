@@ -16,7 +16,8 @@ router = APIRouter(prefix="/auth")
 
 
 @router.post("/signup", response_model=schemas.UserResponse)
-async def signup(session: AsyncSessionDep, user: schemas.UserCreate):
+async def signup(session: AsyncSessionDep, user: schemas.UserCreate, r: Request):
+    print(r.url)
     if not user.email:
         raise HTTPException(status_code=400, detail="Email is required")
     if not user.username:
