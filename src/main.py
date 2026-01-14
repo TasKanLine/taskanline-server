@@ -1,5 +1,5 @@
-import asyncio
 import uvicorn
+from contextlib import asynccontextmanager  # Импортируем
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -12,7 +12,18 @@ PORT = settings.core.PORT
 ALLOWED_ORIGINS = settings.core.ALLOWED_ORIGINS
 
 
-app = FastAPI()
+# === ВНЕДРЯЕМ LIFESPAN ===
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Логика при старте приложения (внутри правильного Loop)
+    await setup_database()
+    yield
+    # Логика при остановке (например, закрытие пула, если нужно)
+    # from database.session import engine
+    # await engine.dispose()
+
+
+app = FastAPI(lifespan=lifespan)  # Подключаем lifespan
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,5 +42,7 @@ async def root():
 
 
 if __name__ == "__main__":
-    asyncio.run(setup_database())
-    uvicorn.run("main:app", host=HOST, port=PORT)
+    # Убираем asyncio.run(setup_database())
+    # Запускаем uvicorn, он сам вызовет lifespan при старте
+    uvicorn.run("main:app", host=HOST, port=PORT, reload=True)
+    # reload=True полезен для разработки, но в Docker лучше без него или с контролем

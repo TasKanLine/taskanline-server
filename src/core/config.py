@@ -39,7 +39,10 @@ class Settings(BaseSettings):
     db_test: SQLiteSettings = SQLiteSettings()
 
     model_config = SettingsConfigDict(
-        env_file=".env", env_nested_delimiter="__", env_file_encoding="utf-8", extra="allow"
+        env_file=".env",
+        env_nested_delimiter="__",
+        env_file_encoding="utf-8",
+        extra="allow",
     )
 
 

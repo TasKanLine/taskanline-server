@@ -1,4 +1,4 @@
-from datetime import datetime, UTC, date
+from datetime import datetime, date
 
 from sqlalchemy import Column, String, Boolean, ForeignKey, Date, TIMESTAMP
 from sqlalchemy.sql import func
@@ -15,7 +15,9 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(30), unique=True, index=True)
     password = Column(String)
     is_admin = Column(Boolean, default=False)
-    created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), default=func.now())
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), default=func.now()
+    )
     updated_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), default=func.now(), onupdate=func.now()
     )
@@ -32,7 +34,9 @@ class UserProfile(Base):
     phone_number: Mapped[str] = mapped_column(String(10), nullable=True)
     gender: Mapped[str] = mapped_column(String(10), nullable=True)
     avatar: Mapped[str] = mapped_column(String(255), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), default=func.now())
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), default=func.now()
+    )
     updated_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), default=func.now(), onupdate=func.now()
     )

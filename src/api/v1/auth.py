@@ -7,7 +7,6 @@ from core.depends import AsyncSessionDep, SecurityDep
 from core.security import security
 from crud import auth as crud
 from schemas import auth as schemas
-from models import users
 
 
 logging.basicConfig(level=logging.NOTSET)
@@ -17,7 +16,6 @@ router = APIRouter(prefix="/auth")
 
 @router.post("/signup", response_model=schemas.UserResponse)
 async def signup(session: AsyncSessionDep, user: schemas.UserCreate, r: Request):
-    print(r.url)
     if not user.email:
         raise HTTPException(status_code=400, detail="Email is required")
     if not user.username:
@@ -27,23 +25,29 @@ async def signup(session: AsyncSessionDep, user: schemas.UserCreate, r: Request)
     if not user.last_name:
         raise HTTPException(status_code=400, detail="Last name is required")
     try:
-        await crud.create_user(session, user)
-        return schemas.UserResponse(
-            email=user.email,
-            username=user.username,
-            first_name=user.first_name,
-            last_name=user.last_name,
-            birth_date=None,
-            phone_number=None,
-            avatar_url=None,
-        )
+        async with session.begin():
+            await crud.create_user(session, user)
+            # await session.commit()
+            return schemas.UserResponse(
+                email=user.email,
+                username=user.username,
+                first_name=user.first_name,
+                last_name=user.last_name,
+                birth_date=None,
+                phone_number=None,
+                avatar_url=None,
+            )
     except IntegrityError:
+        await session.rollback()
         raise HTTPException(status_code=409, detail="Email or username already exists")
 
 
 @router.post("/login", response_model=schemas.UserModel)
 async def login(
-    session: AsyncSessionDep, user_data: schemas.UserLogin, response: Response, r: Request
+    session: AsyncSessionDep,
+    user_data: schemas.UserLogin,
+    response: Response,
+    r: Request,
 ):
     logging.info(r.url)
     print(r.url)
@@ -61,7 +65,9 @@ async def login(
             uid=str(user.username),
             dict={"email": user.email, "username": user.username},
         )
-        response.set_cookie(key="access_token", value=token, samesite="none", secure=True)
+        response.set_cookie(
+            key="access_token", value=token, samesite="none", secure=True
+        )
         return schemas.UserModel(id=user.id, email=user.email, username=user.username)
     except IntegrityError:
         raise HTTPException(status_code=409, detail="Email or username already exists")
