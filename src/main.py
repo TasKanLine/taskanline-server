@@ -1,3 +1,4 @@
+import asyncio
 import uvicorn
 from contextlib import asynccontextmanager  # Импортируем
 from fastapi import FastAPI
@@ -44,5 +45,6 @@ async def root():
 if __name__ == "__main__":
     # Убираем asyncio.run(setup_database())
     # Запускаем uvicorn, он сам вызовет lifespan при старте
+    asyncio.run(setup_database())
     uvicorn.run("main:app", host=HOST, port=PORT, reload=True)
     # reload=True полезен для разработки, но в Docker лучше без него или с контролем
