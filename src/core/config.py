@@ -26,17 +26,9 @@ class PostgresConfig(BaseModel):
         return f"postgresql+asyncpg://{u}:{p}@{self.HOST}:{self.PORT}/{self.DATABASE}"
 
 
-class SQLiteSettings(BaseModel):
-    DATABASE: str = "database/db.sqlite3"
-
-    def url(self) -> str:
-        return f"sqlite+aiosqlite:///{self.DATABASE}"
-
-
 class Settings(BaseSettings):
     core: Core = Core()
     db: PostgresConfig = PostgresConfig()
-    db_test: SQLiteSettings = SQLiteSettings()
 
     model_config = SettingsConfigDict(
         env_file=".env",
