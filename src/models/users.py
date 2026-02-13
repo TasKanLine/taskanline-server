@@ -15,6 +15,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(30), unique=True, index=True)
     password = Column(String)
     is_admin = Column(Boolean, default=False)
+    status = Column(String(20), default="active")
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), default=func.now()
     )

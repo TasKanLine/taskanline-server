@@ -15,6 +15,7 @@ dependencies = [
     "aiosqlite>=0.21.0",
     "argon2-cffi>=25.1.0",
     "authx>=1.4.3",
+    "alembic>=1.18.4",
 ]
 
 [dependency-groups]
