@@ -3,7 +3,7 @@ from fastapi import Depends, HTTPException, Request
 from authx.exceptions import JWTDecodeError
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from database.session import get_session
+from core.database import get_session
 from core.security import security
 
 

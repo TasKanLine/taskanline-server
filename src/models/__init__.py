@@ -1,4 +1,4 @@
-from database.session import engine
+from core.database import engine
 from models.users import Base
 
 
