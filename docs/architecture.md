@@ -1,301 +1,246 @@
-# 🏗️ Архитектура и структура проекта
+# Архитектура TasKanLine Backend
 
-## 📋 Обзор архитектуры
+## Содержание
 
-**TasKanLine Backend** построен по принципам **Clean Architecture** с четким разделением слоев ответственности. Это обеспечивает масштабируемость, тестируемость и легкость поддержки кода.
-
-### 🎯 Основные принципы
-
-- **🔄 Dependency Injection** — все зависимости передаются через конструкторы
-- **🗂️ Разделение ответственности** — каждый модуль выполняет свою задачу
-- **⚡ Асинхронность** — все операции с БД выполняются асинхронно
-- **🛡️ Типизация** — строгая типизация на всех уровнях
-- **🔧 Конфигурируемость** — гибкая настройка окружения
-
-## 📁 Структура проекта
-
-### 📂 Основные каталоги и файлы
-
-```
-📁 TasKanLine/server/
-├── 📁 src/                          # Основной исходный код
-│   ├── 📁 api/                      # API роуты и контроллеры
-│   │   ├── 📁 v1/                   # API версии 1
-│   │   │   ├── 📄 auth.py          # Эндпоинты аутентификации
-│   │   │   └── 📄 __init__.py      # Инициализация модуля
-│   │   └── 📄 __init__.py          # Инициализация API
-│   ├── 📁 core/                     # Основная конфигурация
-│   │   ├── 📄 config.py            # Настройки приложения
-│   │   ├── 📄 depends.py           # Зависимости FastAPI
-│   │   └── 📄 security.py          # Настройка безопасности JWT
-│   ├── 📁 crud/                     # Бизнес-логика работы с данными
-│   │   ├── 📄 auth.py              # CRUD операции для пользователей
-│   │   └── 📄 __init__.py          # Инициализация CRUD
-│   ├── 📁 database/                 # Работа с базой данных
-│   │   └── 📄 session.py           # Настройка SQLAlchemy сессий
-│   ├── 📁 models/                   # SQLAlchemy модели данных
-│   │   ├── 📄 users.py             # Модели User и UserProfile
-│   │   └── 📄 __init__.py          # Инициализация моделей
-│   ├── 📁 schemas/                  # Pydantic схемы валидации
-│   │   ├── 📄 auth.py              # Схемы для аутентификации
-│   │   └── 📄 __init__.py          # Инициализация схем
-│   ├── 📁 services/                 # Сервисный слой (готов к расширению)
-│   │   └── 📄 main.py              # Основные сервисы
-│   └── 📄 main.py                   # Точка входа в приложение
-├── 📁 docs/                         # Документация проекта
-├── 📁 database/                     # Файлы баз данных (SQLite)
-├── 📄 .env.example                  # Пример конфигурации окружения
-├── 📄 .gitignore                    # Игнорируемые файлы Git
-├── 📄 .python-version               # Версия Python для uv
-├── 📄 Dockerfile                    # Инструкция сборки Docker образа
-├── 📄 Makefile                      # Команды управления проектом
-├── 📄 pyproject.toml               # Метаданные проекта и зависимости
-├── 📄 requirements.txt             # Зависимости для Docker
-├── 📄 README.md                     # Основная документация
-└── 📄 uv.lock                      # Заблокированные зависимости uv
-```
-
-### 📝 Назначение основных файлов
-
-| Файл | Назначение | Ключевая функциональность |
-|------|------------|---------------------------|
-| **`src/main.py`** | Точка входа | Создание FastAPI приложения, настройка middleware |
-| **`src/core/config.py`** | Конфигурация | Настройки БД, JWT, CORS, переменные окружения |
-| **`src/core/security.py`** | Безопасность | Настройка AuthX, JWT токены, куки |
-| **`src/core/depends.py`** | Зависимости | Сессии БД, аутентификация пользователей |
-| **`src/database/session.py`** | БД сессии | SQLAlchemy engine, сессии, подключение |
-| **`src/models/users.py`** | Модели данных | User, UserProfile модели SQLAlchemy |
-| **`src/schemas/auth.py`** | Схемы | Pydantic модели для валидации данных |
-| **`src/crud/auth.py`** | Бизнес-логика | CRUD операции для пользователей |
-| **`src/api/v1/auth.py`** | API роуты | Эндпоинты /signup, /login, /protected |
-
-## 🎨 Визуализация архитектуры
-
-### 📊 Интерактивная диаграмма репозитория
-
-```mermaid
-graph TB
-    subgraph "📁 TasKanLine/server/"
-        A[📄 README.md] --> B[📁 src/]
-        A --> C[📁 docs/]
-        A --> D[📄 Dockerfile]
-        A --> E[📄 Makefile]
-        A --> F[📄 pyproject.toml]
-        
-        subgraph "📁 src/"
-            B --> G[📄 main.py]
-            B --> H[📁 api/]
-            B --> I[📁 core/]
-            B --> J[📁 crud/]
-            B --> K[📁 models/]
-            B --> L[📁 schemas/]
-            B --> M[📁 database/]
-            B --> N[📁 services/]
-            
-            subgraph "📁 api/"
-                H --> O[📁 v1/]
-                O --> P[📄 auth.py]
-            end
-            
-            subgraph "📁 core/"
-                I --> Q[📄 config.py]
-                I --> R[📄 depends.py]
-                I --> S[📄 security.py]
-            end
-            
-            subgraph "📁 crud/"
-                J --> T[📄 auth.py]
-            end
-            
-            subgraph "📁 models/"
-                K --> U[📄 users.py]
-            end
-            
-            subgraph "📁 schemas/"
-                L --> V[📄 auth.py]
-            end
-            
-            subgraph "📁 database/"
-                M --> W[📄 session.py]
-            end
-            
-            subgraph "📁 services/"
-                N --> X[📄 main.py]
-            end
-        end
-        
-        subgraph "📁 docs/"
-            C --> Y[📄 index.md]
-            C --> Z[📄 architecture.md]
-            C --> AA[📄 installation.md]
-            C --> BB[📄 usage.md]
-            C --> CC[📄 contributing.md]
-        end
-    end
-    
-    style A fill:#e1f5fe
-    style B fill:#f3e5f5
-    style C fill:#e8f5e8
-    style D fill:#fff3e0
-    style E fill:#fff3e0
-    style F fill:#fff3e0
-```
-
-### 🔄 Flow Diagram архитектуры приложения
-
-```mermaid
-flowchart TD
-    A[🌐 HTTP Request] --> B[🚀 FastAPI Application]
-    B --> C[🔧 Middleware Layer]
-    C --> D[📍 API Router]
-    D --> E[🔐 Authentication Check]
-    E --> F{Authenticated?}
-    
-    F -->|Yes| G[👤 User Context]
-    F -->|No| H[🚫 401 Unauthorized]
-    
-    G --> I[📋 Request Validation]
-    I --> J[🔍 Pydantic Schema]
-    J --> K[💼 Business Logic]
-    K --> L[🗄️ Database Operations]
-    
-    L --> M[🔄 SQLAlchemy ORM]
-    M --> N[📊 Database]
-    N --> O[✅ Response Processing]
-    O --> P[📤 HTTP Response]
-    
-    subgraph "🏗️ Core Components"
-        Q[⚙️ Config]
-        R[🔐 Security]
-        S[📝 Dependencies]
-        T[🗄️ Sessions]
-    end
-    
-    subgraph "📊 Data Flow"
-        U[📥 Request Data]
-        V[🔄 Validation]
-        W[💾 Storage]
-        X[📤 Response Data]
-    end
-    
-    B -.-> Q
-    E -.-> R
-    K -.-> S
-    L -.-> T
-    
-    style A fill:#e3f2fd
-    style P fill:#e8f5e8
-    style H fill:#ffebee
-    style N fill:#fff3e0
-```
-
-### 🎯 Архитектурные слои
-
-```mermaid
-graph LR
-    subgraph "🎯 Presentation Layer"
-        A[🌐 API Endpoints]
-        B[📝 Request/Response]
-    end
-    
-    subgraph "🔧 Business Logic Layer"
-        C[💼 CRUD Operations]
-        D[🔍 Validation]
-        E[👤 User Management]
-    end
-    
-    subgraph "🗄️ Data Access Layer"
-        F[🔄 SQLAlchemy ORM]
-        G[📊 Database Models]
-        H[🔗 Sessions]
-    end
-    
-    subgraph "⚙️ Infrastructure Layer"
-        I[🗄️ PostgreSQL/SQLite]
-        J[🔐 JWT Security]
-        K[📝 Configuration]
-    end
-    
-    A --> C
-    B --> D
-    C --> F
-    D --> G
-    E --> H
-    F --> I
-    G --> J
-    H --> K
-    
-    style A fill:#e3f2fd
-    style C fill:#f3e5f5
-    style F fill:#e8f5e8
-    style I fill:#fff3e0
-```
-
-## 🔄 Поток данных в приложении
-
-### 📋 Типичный запрос аутентификации
-
-```mermaid
-sequenceDiagram
-    participant C as 🌐 Client
-    participant A as 🚀 FastAPI
-    participant M as 🔧 Middleware
-    participant R as 📍 Router
-    participant V as 🔍 Validator
-    participant B as 💼 CRUD
-    participant D as 🗄️ Database
-    
-    C->>A: POST /api/v1/auth/login
-    A->>M: CORS & Security Check
-    M->>R: Route to auth endpoint
-    R->>V: Validate request body
-    V->>B: Call login CRUD operation
-    B->>D: Check user credentials
-    D-->>B: User data
-    B->>B: Verify password (Argon2)
-    B->>B: Generate JWT token
-    B-->>R: Success with token
-    R->>A: Set cookie with token
-    A-->>C: 200 OK with auth cookie
-```
-
-## 🎨 Принципы проектирования
-
-### 🏛️ SOLID принципы в проекте
-
-1. **S - Single Responsibility**: Каждый класс выполняет одну задачу
-2. **O - Open/Closed**: Готов к расширению без модификации
-3. **L - Liskov Substitution**: Модели корректно наследуются
-4. **I - Interface Segregation**: Четкое разделение интерфейсов
-5. **D - Dependency Inversion**: Зависимости инжектируются
-
-### 🔄 Паттерны проектирования
-
-- **🏭 Repository Pattern** — CRUD операции инкапсулированы
-- **🔧 Dependency Injection** — зависимости передаются через FastAPI
-- **🎭 Factory Pattern** — сессии БД создаются через фабрики
-- **📝 Strategy Pattern** — разные БД (PostgreSQL/SQLite)
-
-## 🚀 Масштабирование и расширение
-
-### 📈 Готовность к росту
-
-Архитектура проекта готова к:
-
-- **📊 Новым модулям** — задачи, проекты, команды
-- **🔌 Микросервисам** — выделение отдельных сервисов
-- **🗄️ Разным БД** — Redis, MongoDB, другие SQL
-- **🌐 Load Balancing** — горизонтальное масштабирование
-- **📦 Caching** — многоуровневое кеширование
-
-### 🎯 Следующие шаги развития
-
-1. **📋 Task Management** — CRUD для задач
-2. **👥 Team Collaboration** — команды и роли
-3. **📊 Analytics** — отчеты и статистика
-4. **🔔 Notifications** — система уведомлений
-5. **🌐 API v2** — следующая версия API
+- [Общая архитектура](#общая-архитектура)
+- [Структура директорий](#структура-директорий)
+- [Слои приложения](#слои-приложения)
+- [Поток запроса](#поток-запроса)
+- [Модель данных](#модель-данных)
+- [Аутентификация](#аутентификация)
+- [Регистрация роутеров](#регистрация-роутеров)
 
 ---
 
-**💡 Совет:** Изучите диаграммы выше, чтобы лучше понять, как компоненты взаимодействуют друг с другом. Это поможет вам эффективно работать с проектом! 🚀
+## Общая архитектура
+
+Монолитное приложение с разделением на слои: роутеры → CRUD → SQLAlchemy ORM → PostgreSQL.
+
+```mermaid
+graph TB
+    Client[Клиент]
+
+    subgraph FastAPI
+        Router[Роутеры\nsrc/api/v1/]
+        CRUD[Бизнес-логика\nsrc/crud/]
+        Models[ORM-модели\nsrc/models/]
+        Schemas[Pydantic-схемы\nsrc/schemas/]
+        Core[Ядро\nsrc/core/]
+    end
+
+    DB[(PostgreSQL)]
+
+    Client -->|HTTP| Router
+    Router -->|валидация| Schemas
+    Router -->|вызов| CRUD
+    CRUD -->|запросы| Models
+    Models -->|asyncpg| DB
+    Core -->|config, security, depends| Router
+    Core -->|сессия БД| CRUD
+```
+
+## Структура директорий
+
+```
+src/
+├── main.py                  # Точка входа: FastAPI app, CORS, роутеры
+├── api/
+│   ├── __init__.py          # Префикс /api, объединение роутеров v1
+│   └── v1/
+│       ├── __init__.py      # Сборка роутеров v1
+│       ├── auth.py          # /auth — регистрация, вход, выход, профиль
+│       ├── projects.py      # /projects — CRUD проектов
+│       ├── boards.py        # /projects/{id}/boards, /boards/{id}
+│       ├── columns.py       # /boards/{id}/columns, /columns/{id}
+│       └── tasks.py         # /columns/{id}/tasks, /tasks/{id}
+├── core/
+│   ├── config.py            # Pydantic Settings (CORE__ и DB__ переменные)
+│   ├── database.py          # SQLAlchemy engine, Base, get_session
+│   ├── depends.py           # AsyncSessionDep, SecurityDep (FastAPI зависимости)
+│   └── security.py          # AuthX конфигурация (JWT cookie + header)
+├── crud/
+│   ├── auth.py              # CRUD пользователей и профилей
+│   └── tasks.py             # CRUD проектов, досок, колонок, задач
+├── models/
+│   ├── __init__.py          # Импорт всех моделей (нужен Alembic)
+│   ├── users.py             # User, UserProfile
+│   └── tasks.py             # Project, Board, Column, Task
+├── schemas/
+│   ├── auth.py              # UserCreate, UserLogin, UserResponse, UserModel
+│   └── tasks.py             # ProjectCreate/Response, BoardCreate/Response,
+│                            # ColumnCreate/Response, TaskCreate/Update/Response/Move
+└── services/                # Сервисный слой (зарезервирован, пока пустой)
+```
+
+## Слои приложения
+
+```mermaid
+graph LR
+    subgraph Presentation
+        A[Роутеры api/v1/]
+        B[Pydantic-схемы]
+    end
+
+    subgraph BusinessLogic
+        C[CRUD-функции crud/]
+    end
+
+    subgraph DataAccess
+        D[SQLAlchemy ORM models/]
+        E[AsyncSession]
+    end
+
+    subgraph Infrastructure
+        F[(PostgreSQL asyncpg)]
+        G[AuthX JWT]
+        H[Pydantic Settings]
+    end
+
+    A --> B
+    A --> C
+    C --> D
+    D --> E
+    E --> F
+    A --> G
+    A --> H
+```
+
+## Поток запроса
+
+Пример: создание задачи `POST /api/v1/columns/{id}/tasks`
+
+```mermaid
+sequenceDiagram
+    participant C as Клиент
+    participant R as Router tasks.py
+    participant S as SecurityDep
+    participant DB as AsyncSession
+    participant CRUD as crud/tasks.py
+    participant PG as PostgreSQL
+
+    C->>R: POST /api/v1/columns/3/tasks + cookie
+    R->>S: get_current_user(request)
+    S-->>R: payload sub=username
+    R->>DB: get_session()
+    R->>CRUD: get_user_by_username(session, username)
+    CRUD->>PG: SELECT users WHERE username=?
+    PG-->>CRUD: User id=1
+    R->>CRUD: create_task(session, column_id=3, creator_id=1, data)
+    CRUD->>PG: INSERT INTO tasks
+    PG-->>CRUD: Task id=42
+    CRUD-->>R: Task
+    R-->>C: 201 TaskResponse
+```
+
+## Модель данных
+
+```mermaid
+erDiagram
+    users {
+        int id PK
+        str email UK
+        str username UK
+        str password
+        bool is_admin
+        str status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    user_profiles {
+        int id PK
+        int user_id FK
+        str first_name
+        str last_name
+        date birth_date
+        str phone_number
+        str gender
+        str avatar
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    projects {
+        int id PK
+        int owner_id FK
+        str name
+        str description
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    boards {
+        int id PK
+        int project_id FK
+        str name
+        str description
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    columns {
+        int id PK
+        int board_id FK
+        str name
+        int position
+        timestamp created_at
+    }
+
+    tasks {
+        int id PK
+        int column_id FK
+        int creator_id FK
+        int assignee_id FK
+        str title
+        str description
+        str priority
+        date due_date
+        int position
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    users ||--o{ user_profiles : "профиль"
+    users ||--o{ projects : "владеет"
+    users ||--o{ tasks : "создаёт"
+    users ||--o{ tasks : "назначен"
+    projects ||--o{ boards : "CASCADE"
+    boards ||--o{ columns : "CASCADE"
+    columns ||--o{ tasks : "CASCADE"
+```
+
+## Аутентификация
+
+JWT-токен подписывается секретом `CORE__JWT_SECRET_KEY`. Токен хранится в cookie `access_token` (устанавливается при логине, удаляется при логауте). Также принимается через заголовок `Authorization: Bearer <token>`.
+
+Декодирование выполняется в `SecurityDep` (`src/core/depends.py`). Полезная нагрузка токена содержит `sub` (username), `email`, `username`.
+
+```mermaid
+sequenceDiagram
+    participant C as Клиент
+    participant A as POST /auth/login
+    participant DB as PostgreSQL
+    participant P as Защищённый эндпоинт
+
+    C->>A: email + password
+    A->>DB: SELECT user WHERE email=?
+    DB-->>A: User
+    A->>A: Argon2.verify(password, hash)
+    A->>A: create_access_token(sub=username)
+    A-->>C: 200 + Set-Cookie access_token
+
+    C->>P: GET /auth/me + Cookie
+    P->>P: SecurityDep decode JWT
+    P->>DB: SELECT user WHERE username=sub
+    P-->>C: 200 user_data
+```
+
+## Регистрация роутеров
+
+```
+src/api/v1/__init__.py  →  собирает: auth, projects, boards, columns, tasks
+src/api/__init__.py     →  добавляет prefix="/api", включает v1-роутер
+src/main.py             →  app.include_router(api_router)
+```
+
+Итоговый базовый путь всех эндпоинтов: `/api/v1/`

@@ -1,157 +1,199 @@
-# 🚀 TasKanLine Backend
+# TasKanLine Backend
 
 [![Python](https://img.shields.io/badge/Python-3.13-blue.svg)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.122+-green.svg)](https://fastapi.tiangolo.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue.svg)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
 
-## 📋 Название и описание
+Асинхронный REST API для системы управления задачами в стиле Kanban. Поддерживает регистрацию и аутентификацию пользователей, управление проектами, досками, колонками и задачами.
 
-**TasKanLine** — это мощный backend-сервер для системы управления задачами, построенный на FastAPI с асинхронной архитектурой. Проект предоставляет REST API для аутентификации пользователей и готов к расширению для полноценного управления задачами.
+## Технологии
 
-## 🎯 Краткий обзор
+| Категория        | Технология     | Версия   |
+|------------------|----------------|----------|
+| Язык             | Python         | 3.13     |
+| Фреймворк        | FastAPI        | 0.122+   |
+| ORM              | SQLAlchemy     | 2.0+     |
+| База данных      | PostgreSQL     | 15+      |
+| Асинхронный драйвер | asyncpg     | 0.31+    |
+| Аутентификация   | AuthX          | 1.4+     |
+| Хеширование      | Argon2-cffi    | 25.1+    |
+| ASGI сервер      | Uvicorn        | 0.38+    |
+| Валидация        | Pydantic       | 2.12+    |
+| Миграции         | Alembic        | 1.18+    |
+| Линтер           | Ruff           | 0.14+    |
 
-- 🔐 **JWT аутентификация** через cookies с использованием AuthX
-- 🗄️ **Асинхронная работа с БД** через SQLAlchemy 2.0
-- 🐳 **Docker контейнеризация** для простого развертывания
-- 🚀 **Высокая производительность** с Uvicorn ASGI сервером
-- 🛡️ **Безопасность** с Argon2 хешированием паролей
-- 📝 **Автоматическая документация** API через Swagger/OpenAPI
+## Требования
 
-## 🛠️ Стек технологий
+- Python 3.13+
+- PostgreSQL 15+ (запущенный и доступный)
+- [uv](https://github.com/astral-sh/uv) — для локальной разработки
+- Docker — для контейнерного запуска
 
-| Категория | Технология | Версия |
-|-----------|------------|--------|
-| **Язык** | Python | 3.13 |
-| **Фреймворк** | FastAPI | 0.104+ |
-| **ORM** | SQLAlchemy | 2.0+ |
-| **База данных** | PostgreSQL / SQLite | 15+ / 3.41+ |
-| **Аутентификация** | AuthX | Latest |
-| **Хеширование** | Argon2 | Latest |
-| **ASGI сервер** | Uvicorn | Latest |
-| **Валидация** | Pydantic | 2.0+ |
-| **Контейнеризация** | Docker | Latest |
+## Установка
 
-## ⚙️ Установка и запуск
-
-### 📦 Локальная установка
+### Локальная разработка
 
 ```bash
-# Клонируйте репозиторий
+# 1. Клонировать репозиторий
 git clone <repository-url>
 cd TasKanLine/server
 
-# Установите зависимости через uv
+# 2. Создать файл переменных окружения
+cp .env.example .env
+# Отредактировать .env — указать реквизиты PostgreSQL и JWT-секрет
+
+# 3. Установить зависимости и запустить (hot reload)
 make dev
 
-# Или вручную:
-uv sync
-uv run src/main.py
+# 4. Применить миграции (в отдельном терминале)
+uv run alembic upgrade head
 ```
 
-### 🐳 Docker установка
+### Docker
 
 ```bash
-# Сборка и запуск
+# Сборка образа и запуск контейнера
 make build-run
 
-# Только запуск существующего образа
-make run
-
 # Управление контейнером
-make start    # запустить
-make stop     # остановить
+make start    # запустить остановленный контейнер
+make stop     # остановить контейнер
 make clean    # удалить контейнер и образ
+
+# Полное обновление (git pull + пересборка + запуск)
+make update-app
 ```
 
-### 🔄 Обновление проекта
+## Переменные окружения
+
+Создайте файл `.env` на основе `.env.example`:
+
+| Переменная             | Описание                             | Обязательная | По умолчанию |
+|------------------------|--------------------------------------|:------------:|:------------:|
+| `CORE__HOST`           | Хост для запуска сервера             | ✅           | `0.0.0.0`    |
+| `CORE__PORT`           | Порт для запуска сервера             | ✅           | `8000`       |
+| `CORE__ALLOWED_ORIGINS`| Разрешённые CORS-источники (JSON)    | ✅           | `["*"]`      |
+| `CORE__JWT_SECRET_KEY` | Секретный ключ для подписи JWT       | ✅           | —            |
+| `DB__HOST`             | Хост PostgreSQL                      | ✅           | `localhost`  |
+| `DB__PORT`             | Порт PostgreSQL                      | ✅           | `5432`       |
+| `DB__USER`             | Пользователь PostgreSQL              | ✅           | `postgres`   |
+| `DB__PASSWORD`         | Пароль PostgreSQL                    | ✅           | —            |
+| `DB__DATABASE`         | Имя базы данных                      | ✅           | `postgres`   |
+
+## Использование
+
+После запуска сервер доступен по адресу `http://localhost:8000`.
+
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
+
+## API
+
+Базовый префикс всех эндпоинтов: `/api/v1`
+
+### Аутентификация
+
+| Метод  | Путь                  | Описание                          | Auth |
+|--------|-----------------------|-----------------------------------|:----:|
+| POST   | `/auth/signup`        | Регистрация нового пользователя   | —    |
+| POST   | `/auth/login`         | Вход, устанавливает cookie с JWT  | —    |
+| GET    | `/auth/me`            | Данные текущего пользователя      | ✅   |
+| POST   | `/auth/logout`        | Выход, удаляет cookie             | —    |
+
+### Проекты
+
+| Метод  | Путь                  | Описание                          | Auth |
+|--------|-----------------------|-----------------------------------|:----:|
+| POST   | `/projects`           | Создать проект                    | ✅   |
+| GET    | `/projects`           | Список своих проектов             | ✅   |
+| GET    | `/projects/{id}`      | Получить проект по ID             | ✅   |
+| DELETE | `/projects/{id}`      | Удалить проект                    | ✅   |
+
+### Доски
+
+| Метод  | Путь                              | Описание                     | Auth |
+|--------|-----------------------------------|------------------------------|:----:|
+| POST   | `/projects/{id}/boards`           | Создать доску в проекте      | ✅   |
+| GET    | `/projects/{id}/boards`           | Список досок проекта         | ✅   |
+| GET    | `/boards/{id}`                    | Получить доску по ID         | ✅   |
+| DELETE | `/boards/{id}`                    | Удалить доску                | ✅   |
+
+### Колонки
+
+| Метод  | Путь                              | Описание                     | Auth |
+|--------|-----------------------------------|------------------------------|:----:|
+| POST   | `/boards/{id}/columns`            | Создать колонку в доске      | ✅   |
+| GET    | `/boards/{id}/columns`            | Список колонок доски         | ✅   |
+| DELETE | `/columns/{id}`                   | Удалить колонку              | ✅   |
+
+### Задачи
+
+| Метод  | Путь                              | Описание                     | Auth |
+|--------|-----------------------------------|------------------------------|:----:|
+| POST   | `/columns/{id}/tasks`             | Создать задачу в колонке     | ✅   |
+| GET    | `/columns/{id}/tasks`             | Список задач колонки         | ✅   |
+| GET    | `/tasks/{id}`                     | Получить задачу по ID        | ✅   |
+| PATCH  | `/tasks/{id}`                     | Обновить задачу              | ✅   |
+| PATCH  | `/tasks/{id}/move`                | Переместить задачу           | ✅   |
+| DELETE | `/tasks/{id}`                     | Удалить задачу               | ✅   |
+
+Аутентификация — JWT-токен, передаётся как cookie `access_token` или в заголовке `Authorization: Bearer <token>`.
+
+## Структура проекта
+
+```
+.
+├── src/
+│   ├── main.py              # Точка входа, настройка FastAPI и CORS
+│   ├── api/
+│   │   ├── __init__.py      # Регистрация роутеров с префиксом /api
+│   │   └── v1/
+│   │       ├── __init__.py  # Сборка роутеров v1
+│   │       ├── auth.py      # Эндпоинты аутентификации
+│   │       ├── projects.py  # Эндпоинты проектов
+│   │       ├── boards.py    # Эндпоинты досок
+│   │       ├── columns.py   # Эндпоинты колонок
+│   │       └── tasks.py     # Эндпоинты задач
+│   ├── core/
+│   │   ├── config.py        # Pydantic-настройки из переменных окружения
+│   │   ├── database.py      # SQLAlchemy engine и Base
+│   │   ├── depends.py       # FastAPI зависимости (сессия БД, JWT)
+│   │   └── security.py      # Конфигурация AuthX
+│   ├── crud/
+│   │   ├── auth.py          # CRUD операции с пользователями
+│   │   └── tasks.py         # CRUD операции с проектами, досками, колонками, задачами
+│   ├── models/
+│   │   ├── users.py         # ORM модели User, UserProfile
+│   │   └── tasks.py         # ORM модели Project, Board, Column, Task
+│   └── schemas/
+│       ├── auth.py          # Pydantic схемы для аутентификации
+│       └── tasks.py         # Pydantic схемы для задач
+├── migrations/
+│   ├── env.py               # Конфигурация Alembic
+│   └── versions/            # Файлы миграций
+├── Dockerfile
+├── docker-compose.yml
+├── Makefile
+├── pyproject.toml
+├── requirements.txt         # Для Docker-сборки (генерируется через uv pip freeze)
+├── alembic.ini
+└── .env.example
+```
+
+## Миграции базы данных
 
 ```bash
-make update-app  # git pull + пересборка + запуск
+# Создать новую миграцию
+uv run alembic revision --autogenerate -m "описание изменений"
+
+# Применить миграции
+uv run alembic upgrade head
+
+# Откатить последнюю миграцию
+uv run alembic downgrade -1
 ```
 
-## 🐳 Инструкция по сборке и запуску Docker образа
+## Лицензия
 
-### 📋 Сборка образа
-
-```bash
-# Автоматически через Makefile
-make build
-
-# Вручную
-docker build -t backend-taskanline .
-```
-
-### 🚀 Запуск контейнера
-
-```bash
-# Стандартный запуск
-docker run -p 8000:8000 --name some-backend-taskanline -d backend-taskanline
-
-# С монтированием тома для разработки
-docker run -p 8000:8000 --name some-backend-taskanline -v "$(pwd):/app/" -d backend-taskanline
-```
-
-### 🌐 Доступ к API
-
-После запуска API будет доступен по адресу:
-- **API**: `http://localhost:8000`
-- **Документация**: `http://localhost:8000/docs`
-- **ReDoc**: `http://localhost:8000/redoc`
-
-## 📖 Использование
-
-### 🔐 Эндпоинты аутентификации
-
-| Метод | Эндпоинт | Описание |
-|-------|----------|----------|
-| `POST` | `/api/v1/auth/signup` | Регистрация нового пользователя |
-| `POST` | `/api/v1/auth/login` | Вход пользователя |
-| `GET` | `/api/v1/auth/protected` | Защищенный эндпоинт (требует аутентификации) |
-
-### 📝 Примеры запросов
-
-#### Регистрация пользователя
-```bash
-curl -X POST "http://localhost:8000/api/v1/auth/signup" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "securepassword123"
-  }'
-```
-
-#### Вход пользователя
-```bash
-curl -X POST "http://localhost:8000/api/v1/auth/login" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "securepassword123"
-  }' \
-  -c cookies.txt
-```
-
-#### Доступ к защищенному эндпоинту
-```bash
-curl -X GET "http://localhost:8000/api/v1/auth/protected" \
-  -b cookies.txt
-```
-
-## 📚 Документация
-
-Более подробная документация доступна в папке [`docs/`](docs/):
-
-- 📖 [Введение](docs/index.md)
-- 🏗️ [Архитектура](docs/architecture.md)
-- ⚙️ [Установка](docs/installation.md)
-- 💡 [Использование](docs/usage.md)
-- 🤝 [Вклад в проект](docs/contributing.md)
-
-## 🤝 Поддержка
-
-Если у вас есть вопросы или предложения, пожалуйста, создайте issue в репозитории или свяжитесь с командой разработки.
-
----
-
-**Сделано с ❤️ для эффективного управления задачами**
+Не указана.

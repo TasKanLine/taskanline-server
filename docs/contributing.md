@@ -1,464 +1,164 @@
-# 🤝 Вклад в проект
+# Руководство разработчика
 
-## 🎯 Добро пожаловать в команду!
+## Содержание
 
-Мы рады приветствовать вас в сообществе **TasKanLine**! Этот гайд поможет вам начать вклад в развитие проекта.
+- [Настройка окружения](#настройка-окружения)
+- [Процесс разработки](#процесс-разработки)
+- [Стиль кода](#стиль-кода)
+- [Добавление новой фичи](#добавление-новой-фичи)
+- [Полезные команды](#полезные-команды)
 
-## 🚀 Как начать
+---
 
-### 📋 Шаг 1: Изучение проекта
-
-1. 📖 **Прочитайте документацию**
-   - [Введение](index.md) — обзор проекта
-   - [Архитектура](architecture.md) — структура проекта
-   - [Использование](usage.md) — работа с API
-
-2. 🍴 **Скопируйте репозиторий**
-   ```bash
-   git clone <repository-url>
-   cd TasKanLine/server
-   ```
-
-3. 🛠️ **Настройте окружение**
-   ```bash
-   # Установите зависимости
-   make dev
-   
-   # Создайте .env файл
-   cp .env.example .env
-   ```
-
-4. 🧪 **Запустите проект**
-   ```bash
-   uv run src/main.py
-   ```
-
-### 📋 Шаг 2: Выбор задачи
-
-1. 🔍 **Изучите Issues**
-   - Откройте раздел [Issues](https://github.com/your-repo/issues)
-   - Найдите задачи с меткой `good first issue`
-
-2. 🏷️ **Метки приоритета**
-   - 🔥 `high` — критические ошибки
-   - 🟡 `medium` — важные улучшения
-   - 🟢 `low` — мелкие правки
-
-3. 💬 **Обсудите задачу**
-   - Оставьте комментарий в Issue
-   - Уточните детали у команды
-
-## 🛠️ Процесс разработки
-
-### 📋 Ветвление и коммиты
-
-#### 🌳 Стратегия ветвления
+## Настройка окружения
 
 ```bash
-# Создайте ветку для своей задачи
-git checkout -b feature/your-feature-name
+# Клонировать и перейти в директорию
+git clone <repository-url>
+cd TasKanLine/server
 
-# Или для исправления ошибки
-git checkout -b fix/bug-description
+# Установить зависимости (включая dev: ruff, ty)
+uv sync
+
+# Создать .env
+cp .env.example .env
+# Заполнить DB__* и CORE__JWT_SECRET_KEY
+
+# Применить миграции
+uv run alembic upgrade head
+
+# Запустить сервер с hot reload
+make dev
 ```
 
-#### 📝 Правила именования веток
-
-- `feature/` — новая функциональность
-- `fix/` — исправление ошибок
-- `docs/` — документация
-- `refactor/` — рефакторинг кода
-- `test/` — тесты
-
-#### ✨ Стиль коммитов
-
-Используйте [Conventional Commits](https://www.conventionalcommits.org/):
-
-```bash
-# Функциональность
-git commit -m "feat: add user profile endpoint"
-
-# Исправление
-git commit -m "fix: resolve authentication token issue"
-
-# Документация
-git commit -m "docs: update API documentation"
-
-# Тесты
-git commit -m "test: add unit tests for user service"
-```
-
-### 🧪 Разработка и тестирование
-
-#### 🔄 Цикл разработки
+## Процесс разработки
 
 ```mermaid
-graph LR
-    A[🌿 Branch] --> B[💻 Code]
-    B --> C[🧪 Test]
-    C --> D[✅ Lint]
-    D --> E[📦 Build]
-    E --> F[🚀 Deploy]
-    
-    style A fill:#e3f2fd
-    style B fill:#f3e5f5
-    style C fill:#e8f5e8
-    style D fill:#fff3e0
-    style E fill:#fce4ec
-    style F fill:#f1f8e9
+flowchart LR
+    A[Создать ветку] --> B[Написать код]
+    B --> C[Проверить ruff]
+    C --> D[Запустить сервер\nи проверить вручную]
+    D --> E[Коммит]
+    E --> F[Pull Request в main]
 ```
 
-#### 🧪 Запуск тестов
+Соглашения по именованию веток:
+- `feature/<описание>` — новая функциональность
+- `fix/<описание>` — исправление бага
+- `refactor/<описание>` — рефакторинг
+- `docs/<описание>` — документация
+
+Стиль коммитов (Conventional Commits):
+```bash
+git commit -m "feat: добавить эндпоинт назначения задачи"
+git commit -m "fix: исправить 500 при пустом assignee_id"
+git commit -m "refactor: вынести _get_current_user_id в depends"
+git commit -m "docs: обновить usage.md"
+```
+
+## Стиль кода
+
+Линтер и форматтер — **Ruff** (конфигурация по умолчанию):
 
 ```bash
-# Запуск всех тестов
-make test
+# Проверить
+uv run ruff check src/
 
-# Запуск конкретного теста
-pytest tests/test_auth.py
+# Исправить автоматически
+uv run ruff check --fix src/
 
-# Запуск с покрытием
-pytest --cov=src tests/
+# Форматировать
+uv run ruff format src/
 ```
 
-#### 🔍 Проверка кода
-
+Проверка типов — **ty**:
 ```bash
-# Форматирование кода
-make format
-
-# Проверка линтинга
-make lint
-
-# Проверка типов
-make typecheck
+uv run ty check src/
 ```
 
-### 📝 Pull Request
+Основные соглашения:
+- Все функции с типами (`def foo(x: int) -> str`)
+- Асинхронные функции для всех операций с БД
+- Сессия БД только через `AsyncSessionDep`
+- JWT-пользователь только через `SecurityDep`
+- Транзакции через `async with session.begin()` для write-операций
 
-#### 🚀 Создание Pull Request
+## Добавление новой фичи
 
-1. 📤 **Отправьте изменения**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
+Пример: добавить сущность `Label` (метка для задачи).
 
-2. 🌐 **Создайте PR**
-   - Откройте GitHub
-   - Нажмите "New Pull Request"
-   - Выберите свою ветку
-
-3. 📋 **Заполните шаблон PR**
-
-```markdown
-## 📋 Описание
-Краткое описание изменений
-
-## 🎯 Тип изменений
-- [ ] 🐛 Bug fix
-- [ ] ✨ New feature
-- [ ] 💡 Breaking change
-- [ ] 📝 Documentation update
-
-## 🧪 Тестирование
-- [ ] Добавлены тесты
-- [ ] Все тесты проходят
-- [ ] Ручное тестирование выполнено
-
-## 📸 Скриншоты
-(если применимо)
-
-## 🔗 Связанные Issues
-Closes #123
-```
-
-#### ✅ Требования к PR
-
-- ✅ **Тесты** — все тесты должны проходить
-- ✅ **Линтинг** — код должен соответствовать стандартам
-- ✅ **Документация** — обновлена при необходимости
-- ✅ **Совместимость** — не ломает существующий функционал
-
-## 📚 Стандарты кода
-
-### 🐍 Python стандарты
-
-#### 🎯 Стиль кода (PEP 8)
-
+**1. Модель** — `src/models/tasks.py`:
 ```python
-# ✅ Хорошо
-class UserService:
-    def create_user(self, email: str, password: str) -> User:
-        """Create a new user with email and password."""
-        if not self.validate_email(email):
-            raise ValueError("Invalid email format")
-        
-        hashed_password = self.hash_password(password)
-        return self.user_repository.create(email, hashed_password)
-
-# ❌ Плохо
-class userservice:
-    def createuser(self, email, password):
-        if not self.validateemail(email):
-            raise ValueError("Invalid email")
-        return self.userrepository.create(email, self.hashpassword(password))
+class Label(Base):
+    __tablename__ = "labels"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    task_id: Mapped[int] = mapped_column(ForeignKey("tasks.id", ondelete="CASCADE"))
+    name: Mapped[str] = mapped_column(String(50))
+    color: Mapped[str] = mapped_column(String(7))  # hex color
 ```
 
-#### 📝 Документация
-
+**2. Импорт модели** — добавить в `src/models/__init__.py`:
 ```python
-def authenticate_user(email: str, password: str) -> Optional[User]:
-    """
-    Authenticate a user with email and password.
-    
-    Args:
-        email: User's email address
-        password: User's plain text password
-        
-    Returns:
-        User object if authentication successful, None otherwise
-        
-    Raises:
-        ValueError: If email format is invalid
-        DatabaseError: If database operation fails
-        
-    Example:
-        >>> user = authenticate_user("user@example.com", "password123")
-        >>> if user:
-        ...     print(f"Welcome {user.email}")
-    """
+from .tasks import Label  # noqa: F401
 ```
 
-#### 🏷️ Типизация
-
+**3. Схемы** — `src/schemas/tasks.py`:
 ```python
-# ✅ С типизацией
-from typing import Optional, List
-from uuid import UUID
+class LabelCreate(BaseModel):
+    name: str = Field(..., max_length=50)
+    color: str = Field(..., pattern="^#[0-9a-fA-F]{6}$")
 
-def get_user_tasks(user_id: UUID, status: Optional[str] = None) -> List[Task]:
-    """Get tasks for a specific user with optional status filter."""
-    pass
-
-# ❌ Без типизации
-def get_user_tasks(user_id, status=None):
-    pass
+class LabelResponse(BaseModel):
+    id: int
+    task_id: int
+    name: str
+    color: str
+    model_config = {"from_attributes": True}
 ```
 
-### 📝 Стандарты документации
-
-#### 📖 README.md
-
-- 📋 Актуальная информация
-- 🚀 Инструкции по установке
-- 💡 Примеры использования
-- 🤝 Информация для контрибьюторов
-
-#### 📚 Кодовая документация
-
+**4. CRUD** — `src/crud/tasks.py`:
 ```python
-# Модуль: src/services/user.py
-"""
-User service module.
-
-This module provides business logic for user management operations.
-"""
-
-class UserService:
-    """Service for managing user operations."""
-    
-    def __init__(self, user_repository: UserRepository):
-        """
-        Initialize UserService with repository.
-        
-        Args:
-            user_repository: Repository for user data operations
-        """
-        self._repository = user_repository
+async def create_label(session: AsyncSession, task_id: int, data: LabelCreate) -> Label:
+    label = Label(task_id=task_id, **data.model_dump())
+    session.add(label)
+    await session.flush()
+    return label
 ```
 
-## 🧪 Тестирование
-
-### 📋 Виды тестов
-
-#### 🧪 Unit тесты
-
+**5. Роутер** — `src/api/v1/labels.py` (новый файл):
 ```python
-import pytest
-from unittest.mock import Mock, patch
+router = APIRouter(tags=["labels"])
 
-class TestUserService:
-    def setup_method(self):
-        """Setup test environment."""
-        self.mock_repository = Mock()
-        self.service = UserService(self.mock_repository)
-    
-    def test_create_user_success(self):
-        """Test successful user creation."""
-        # Arrange
-        email = "test@example.com"
-        password = "SecurePass123!"
-        
-        # Act
-        result = self.service.create_user(email, password)
-        
-        # Assert
-        assert result.email == email
-        self.mock_repository.create.assert_called_once()
+@router.post("/tasks/{task_id}/labels", response_model=LabelResponse, status_code=201)
+async def create_label(task_id: int, session: AsyncSessionDep, user: SecurityDep, data: LabelCreate):
+    ...
 ```
 
-#### 🔗 Integration тесты
-
+**6. Регистрация** — `src/api/v1/__init__.py`:
 ```python
-import pytest
-from httpx import AsyncClient
-from src.main import app
-
-@pytest.mark.asyncio
-async def test_user_registration_flow():
-    """Test complete user registration flow."""
-    async with AsyncClient(app=app, base_url="http://test") as client:
-        # Register user
-        response = await client.post(
-            "/api/v1/auth/signup",
-            json={"email": "test@example.com", "password": "SecurePass123!"}
-        )
-        assert response.status_code == 201
-        
-        # Login user
-        response = await client.post(
-            "/api/v1/auth/login",
-            json={"email": "test@example.com", "password": "SecurePass123!"}
-        )
-        assert response.status_code == 200
-        
-        # Access protected endpoint
-        response = await client.get("/api/v1/auth/protected")
-        assert response.status_code == 200
+from . import labels
+router.include_router(labels.router)
 ```
 
-### 📊 Покрытие кода
-
+**7. Миграция**:
 ```bash
-# Проверка покрытия
-pytest --cov=src --cov-report=html
-
-# Минимальное требование: 80%
+uv run alembic revision --autogenerate -m "add labels table"
+uv run alembic upgrade head
 ```
 
-## 🔄 Рабочий процесс
+## Полезные команды
 
-### 📅 Ежедневные задачи
-
-1. 🌅 **Утро**
-   - Проверьте новые Issues
-   - Обновите свою ветку
-   - Просмотрите PR команды
-
-2. 🌞 **День**
-   - Разработка по своей задаче
-   - Тестирование изменений
-   - Code review для коллег
-
-3. 🌆 **Вечер**
-   - Создайте коммиты
-   - Отправьте изменения
-   - Обновите статус задачи
-
-### 📋 Еженедельные задачи
-
-1. 📊 **Понедельник** — планирование недели
-2. 🧪 **Среда** — рефакторинг и оптимизация
-3. 📝 **Пятница** — обновление документации
-
-## 🎯 Направления развития
-
-### 📋 Приоритетные задачи
-
-#### 🔥 Высокий приоритет
-
-- 📋 **Task Management** — CRUD для задач
-- 👥 **User Profiles** — профили пользователей
-- 🔐 **Security** — улучшение безопасности
-
-#### 🟡 Средний приоритет
-
-- 📊 **Analytics** — аналитика и отчеты
-- 🔔 **Notifications** — система уведомлений
-- 🌐 **API v2** — следующая версия API
-
-#### 🟢 Низкий приоритет
-
-- 🎨 **UI/UX** — улучшение интерфейса
-- 📦 **Plugins** — система плагинов
-- 🌍 **Internationalization** — мультиязычность
-
-### 🚀 Новые возможности
-
-#### 💡 Идеи для развития
-
-1. **🤖 AI Assistant** — умный помощник
-2. **📱 Mobile App** — мобильное приложение
-3. **🔌 Integrations** — интеграции с другими сервисами
-4. **📊 Advanced Analytics** — продвинутая аналитика
-5. **🌐 Real-time** — real-time обновления
-
-## 🏆 Награды и признание
-
-### 🎖️ Типы вклада
-
-- 💻 **Код** — разработка функционала
-- 📝 **Документация** — улучшение документации
-- 🐛 **Bug Reports** — сообщение об ошибках
-- 💡 **Ideas** — предложения по улучшению
-- 🧪 **Тесты** — написание тестов
-- 🎨 **Design** — улучшение дизайна
-
-### 🌟 Признание вклада
-
-- 📋 **Contributors** — список контрибьюторов
-- 🏆 **Hall of Fame** — лучшие контрибьюторы
-- 🎖️ **Badges** — значки достижений
-- 📢 **Shoutouts** — упоминания в релизах
-
-## 📞 Связь и поддержка
-
-### 💬 Каналы коммуникации
-
-- 💬 **Discord** — общение в реальном времени
-- 📧 **Email** — официальная переписка
-- 🐛 **GitHub Issues** — технические вопросы
-- 📱 **Telegram** — быстрые вопросы
-
-### 🆘 Получение помощи
-
-1. 📋 **Изучите документацию**
-2. 🔍 **Поищите в Issues**
-3. 💬 **Спросите в Discord**
-4. 📧 **Напишите на email**
-
-### 📝 Кодекс поведения
-
-- 🤗 **Уважайте** других участников
-- 💡 **Будьте** конструктивными
-- 🎯 **Фокусируйтесь** на решении проблем
-- 🌟 **Помогайте** новичкам
-- 📚 **Учитесь** у опытных
-
----
-
-## 🎉 Начните сегодня!
-
-Готовы внести свой вклад? Вот что нужно сделать:
-
-1. 🍴 **Fork** репозиторий
-2. 🌿 **Создайте** ветку
-3. 💻 **Напишите** код
-4. 🧪 **Протестируйте**
-5. 📤 **Отправьте** PR
-
-**Мы ждем вас!** 🚀
-
----
-
-*Спасибо за ваш вклад в развитие TasKanLine! Вместе мы создаем лучший инструмент для управления задачами.* 💪✨
+| Команда                                      | Описание                                  |
+|----------------------------------------------|-------------------------------------------|
+| `make dev`                                   | Запуск сервера с hot reload               |
+| `make build`                                 | Собрать Docker-образ                      |
+| `make build-run`                             | Собрать и запустить Docker-контейнер      |
+| `make stop`                                  | Остановить контейнер                      |
+| `make clean`                                 | Удалить контейнер и образ                 |
+| `uv add <package>`                           | Добавить зависимость                      |
+| `uv pip freeze > requirements.txt`           | Обновить requirements.txt для Docker      |
+| `uv run alembic upgrade head`                | Применить миграции                        |
+| `uv run alembic revision --autogenerate -m`  | Создать новую миграцию                    |
+| `uv run ruff check src/`                     | Проверить стиль кода                      |
+| `uv run ruff format src/`                    | Форматировать код                         |
+| `uv run ty check src/`                       | Проверить типы                            |

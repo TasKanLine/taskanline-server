@@ -1,400 +1,168 @@
-# ⚙️ Установка и настройка
-
-## 📋 Системные требования
-
-### 🔧 Минимальные требования
-
-| Компонент | Минимальная версия | Рекомендуемая версия |
-|-----------|-------------------|---------------------|
-| **Python** | 3.13+ | 3.13.0+ |
-| **Оперативная память** | 512 MB | 1 GB+ |
-| **Дисковое пространство** | 500 MB | 1 GB+ |
-| **База данных** | SQLite 3.41+ | PostgreSQL 15+ |
-
-### 🐳 Требования для Docker
-
-| Компонент | Минимальная версия |
-|-----------|-------------------|
-| **Docker** | 20.10+ |
-| **Docker Compose** | 2.0+ |
-
-## 🚀 Способы установки
-
-### 📦 Способ 1: Docker (Рекомендуется)
-
-**Преимущества:**
-- ✅ Изолированное окружение
-- ✅ Автоматические зависимости
-- ✅ Легкое развертывание
-- ✅ Кроссплатформенность
-
-#### 🐳 Быстрый запуск через Docker
-
-```bash
-# 1. Клонируйте репозиторий
-git clone <repository-url>
-cd TasKanLine/server
-
-# 2. Соберите и запустите контейнер
-make build-run
-
-# 3. Проверьте работу
-curl http://localhost:8000/docs
-```
-
-#### 🔧 Подробная Docker установка
-
-```bash
-# Шаг 1: Сборка образа
-docker build -t backend-taskanline .
-
-# Шаг 2: Создание и запуск контейнера
-docker run -d \
-  --name taskanline-backend \
-  -p 8000:8000 \
-  -v $(pwd)/.env:/app/.env \
-  backend-taskanline
-
-# Шаг 3: Проверка статуса
-docker ps
-docker logs taskanline-backend
-```
-
-#### 🌐 Docker Compose (для продакшена)
-
-Создайте файл `docker-compose.yml`:
-
-```yaml
-version: '3.8'
-
-services:
-  backend:
-    build: .
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql://user:password@db:5432/taskanline
-      - SECRET_KEY=your-secret-key-here
-    depends_on:
-      - db
-    volumes:
-      - ./logs:/app/logs
-
-  db:
-    image: postgres:15
-    environment:
-      - POSTGRES_DB=taskanline
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
-volumes:
-  postgres_data:
-```
-
-Запуск:
-
-```bash
-docker-compose up -d
-```
-
-### 💻 Способ 2: Локальная установка
-
-**Преимущества:**
-- ✅ Полный контроль над окружением
-- ✅ Быстрая отладка
-- ✅ Легкое тестирование изменений
-
-#### 📋 Предварительные требования
-
-```bash
-# Установите Python 3.13+
-# Ubuntu/Debian:
-sudo apt update
-sudo apt install python3.13 python3.13-venv python3-pip
-
-# macOS (через Homebrew):
-brew install python@3.13
-
-# Установите uv (менеджер зависимостей)
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-#### 🚀 Установка через uv
-
-```bash
-# 1. Клонируйте репозиторий
-git clone <repository-url>
-cd TasKanLine/server
-
-# 2. Создайте виртуальное окружение
-uv venv
-
-# 3. Активируйте окружение
-# Linux/macOS:
-source .venv/bin/activate
-# Windows:
-.venv\Scripts\activate
-
-# 4. Установите зависимости
-uv sync
-
-# 5. Запустите приложение
-uv run src/main.py
-```
-
-#### 🛠️ Установка через pip (альтернативный способ)
-
-```bash
-# 1. Создайте виртуальное окружение
-python -m venv venv
-
-# 2. Активируйте окружение
-# Linux/macOS:
-source venv/bin/activate
-# Windows:
-venv\Scripts\activate
-
-# 3. Обновите pip
-pip install --upgrade pip
-
-# 4. Установите зависимости
-pip install -r requirements.txt
-
-# 5. Запустите приложение
-python src/main.py
-```
-
-## ⚙️ Настройка окружения
-
-### 📝 Конфигурационные файлы
-
-#### 🗂️ .env файл
-
-Создайте файл `.env` в корне проекта:
-
-```bash
-# База данных
-DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/taskanline
-# или для SQLite:
-# DATABASE_URL=sqlite+aiosqlite:///./database/app.db
-
-# Безопасность
-SECRET_KEY=your-super-secret-key-change-this-in-production
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-# Приложение
-APP_NAME=TasKanLine Backend
-APP_VERSION=1.0.0
-DEBUG=false
-
-# CORS (для фронтенда)
-ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8080
-
-# Сервер
-HOST=0.0.0.0
-PORT=8000
-```
-
-#### 📋 Пример конфигурации
-
-Скопируйте пример конфигурации:
-
-```bash
-cp .env.example .env
-```
-
-Отредактируйте `.env` файл согласно вашим настройкам.
-
-### 🗄️ Настройка базы данных
-
-#### 🐘 PostgreSQL (Рекомендуется для продакшена)
-
-```bash
-# 1. Установите PostgreSQL
-# Ubuntu/Debian:
-sudo apt install postgresql postgresql-contrib
-
-# macOS:
-brew install postgresql
-brew services start postgresql
-
-# 2. Создайте базу данных
-sudo -u postgres createdb taskanline
-
-# 3. Создайте пользователя
-sudo -u postgres psql
-CREATE USER taskanline_user WITH PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE taskanline TO taskanline_user;
-\q
-
-# 4. Обновите .env файл
-DATABASE_URL=postgresql+asyncpg://taskanline_user:your_password@localhost:5432/taskanline
-```
-
-#### 📁 SQLite (Для разработки)
-
-```bash
-# SQLite работает из коробки
-# База данных будет создана автоматически в ./database/app.db
-
-# Обновите .env файл:
-DATABASE_URL=sqlite+aiosqlite:///./database/app.db
-```
-
-### 🔐 Настройка безопасности
-
-#### 🗝️ Генерация секретного ключа
-
-```bash
-# Способ 1: Через Python
-python -c "import secrets; print(secrets.token_urlsafe(32))"
-
-# Способ 2: Через OpenSSL
-openssl rand -hex 32
-
-# Способ 3: Онлайн генератор
-# https://randomkeygen.com/
-```
-
-#### 🔒 Рекомендации по безопасности
-
-- ✅ Используйте длинные случайные ключи
-- ✅ Не храните `.env` в Git
-- ✅ Используйте HTTPS в продакшене
-- ✅ Настройте брандмауэр
-- ✅ Регулярно обновляйте зависимости
-
-## 🧪 Проверка установки
-
-### ✅ Тестирование работы API
-
-```bash
-# 1. Проверьте здоровье сервера
-curl http://localhost:8000
-
-# 2. Откройте документацию API
-# В браузере: http://localhost:8000/docs
-
-# 3. Проверьте эндпоинты аутентификации
-curl -X GET http://localhost:8000/api/v1/auth/protected
-```
-
-### 📊 Проверка подключения к БД
-
-```bash
-# Проверьте создание таблиц при первом запуске
-# Логи должны показать:
-# INFO: Creating tables
-# INFO: Tables created successfully
-```
-
-### 🐳 Проверка Docker контейнера
-
-```bash
-# Проверьте статус контейнера
-docker ps
-
-# Проверьте логи
-docker logs taskanline-backend
-
-# Зайдите в контейнер для отладки
-docker exec -it taskanline-backend bash
-```
-
-## 🛠️ Управление проектом
-
-### 📋 Make команды
-
-Проект включает удобные Make команды:
-
-```bash
-# Разработка
-make dev          # Запуск в режиме разработки
-make build        # Сборка Docker образа
-make run          # Запуск Docker контейнера
-make build-run    # Сборка и запуск
-
-# Управление
-make start        # Запуск контейнера
-make stop         # Остановка контейнера
-make clean        # Удаление контейнера и образа
-make update-app   # Обновление и перезапуск
-
-# База данных
-make db-migrate   # Миграции БД (в будущем)
-make db-seed      # Наполнение БД данными (в будущем)
-```
-
-### 🔄 Обновление проекта
-
-```bash
-# Через Git и Make
-git pull origin main
-make update-app
-
-# Вручную
-git pull origin main
-docker-compose down
-docker-compose build --no-cache
-docker-compose up -d
-```
-
-## 🚨 Решение проблем
-
-### 🔧 Частые проблемы
-
-#### 🐍 Проблемы с Python
-
-```bash
-# Ошибка: Python не найден
-# Решение: Установите Python 3.13+
-
-# Ошибка: Модуль не найден
-# Решение: Активируйте виртуальное окружение
-source .venv/bin/activate
-```
-
-#### 🗄️ Проблемы с базой данных
-
-```bash
-# Ошибка: Подключение к PostgreSQL
-# Решение: Проверьте статус PostgreSQL
-sudo systemctl status postgresql
-
-# Ошибка: Права доступа
-# Решение: Настройте права для пользователя
-sudo -u postgres psql
-GRANT ALL PRIVILEGES ON DATABASE taskanline TO taskanline_user;
-```
-
-#### 🐳 Проблемы с Docker
-
-```bash
-# Ошибка: Порт занят
-# Решение: Освободите порт или измените его
-sudo lsof -i :8000
-docker kill $(docker lsof -i :8000 -q)
-
-# Ошибка: Нет прав на Docker
-# Решение: Добавьте пользователя в группу docker
-sudo usermod -aG docker $USER
-newgrp docker
-```
-
-### 📞 Получение помощи
-
-Если у вас возникли проблемы:
-
-1. 📋 Проверьте [логи приложения](../troubleshooting.md)
-2. 🔍 Изучите [FAQ](../faq.md)
-3. 🐛 Создайте [issue на GitHub](https://github.com/your-repo/issues)
-4. 💬 Свяжитесь с командой разработки
+# Установка и настройка
+
+## Содержание
+
+- [Требования](#требования)
+- [Локальная разработка](#локальная-разработка)
+- [Docker](#docker)
+- [Переменные окружения](#переменные-окружения)
+- [Миграции базы данных](#миграции-базы-данных)
+- [Проверка работоспособности](#проверка-работоспособности)
+- [Типичные проблемы](#типичные-проблемы)
 
 ---
 
-**🎉 Поздравляем!** Вы успешно установили TasKanLine Backend. Теперь перейдите к разделу [Использование](usage.md) чтобы начать работу с API! 🚀
+## Требования
+
+| Компонент  | Версия  | Назначение                        |
+|------------|---------|-----------------------------------|
+| Python     | 3.13+   | Рантайм                           |
+| PostgreSQL | 15+     | База данных                       |
+| uv         | любая   | Менеджер зависимостей (локально)  |
+| Docker     | 20.10+  | Контейнерный запуск               |
+
+Установить `uv`:
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+## Локальная разработка
+
+```mermaid
+flowchart TD
+    A[Клонировать репозиторий] --> B[Создать .env]
+    B --> C[uv sync]
+    C --> D[alembic upgrade head]
+    D --> E[make dev]
+    E --> F[Сервер на :8000]
+```
+
+Шаги:
+
+```bash
+# 1. Клонировать
+git clone <repository-url>
+cd TasKanLine/server
+
+# 2. Создать файл переменных окружения
+cp .env.example .env
+# Отредактировать .env: параметры PostgreSQL и JWT_SECRET_KEY
+
+# 3. Установить зависимости и запустить сервер (hot reload)
+make dev
+# Эквивалентно: uv sync && uv run src/main.py
+
+# 4. Применить миграции (в отдельном терминале)
+uv run alembic upgrade head
+```
+
+## Docker
+
+Проект собирается в образ `backend-taskanline` на базе `python:3.13-slim`. В `docker-compose.yml` описан один сервис `taskanline_server`, подключённый к двум внешним сетям (`taskanline-server-network`, `taskanline-client-network`).
+
+```bash
+# Сгенерировать requirements.txt и собрать образ
+make build
+
+# Запустить контейнер (порт 8000)
+make run
+
+# Сборка + запуск одной командой
+make build-run
+
+# Управление контейнером
+make start    # запустить остановленный
+make stop     # остановить
+make clean    # удалить контейнер и образ
+
+# Полное обновление: git pull + пересборка + запуск
+make update-app
+```
+
+Запуск через Docker Compose (требует внешних сетей):
+```bash
+# Создать внешние сети (один раз)
+docker network create taskanline-server-network
+docker network create taskanline-client-network
+
+# Запустить
+docker compose up -d
+```
+
+## Переменные окружения
+
+Файл `.env` (создаётся из `.env.example`):
+
+| Переменная              | Описание                                  | Обязательная | Пример                         |
+|-------------------------|-------------------------------------------|:------------:|--------------------------------|
+| `CORE__HOST`            | Хост для запуска сервера                  | да           | `0.0.0.0`                      |
+| `CORE__PORT`            | Порт сервера                              | да           | `8000`                         |
+| `CORE__ALLOWED_ORIGINS` | Список CORS-источников (JSON-массив)      | да           | `["http://localhost:3000"]`    |
+| `CORE__JWT_SECRET_KEY`  | Секретный ключ для подписи JWT            | да           | случайная строка               |
+| `DB__HOST`              | Хост PostgreSQL                           | да           | `localhost`                    |
+| `DB__PORT`              | Порт PostgreSQL                           | да           | `5432`                         |
+| `DB__USER`              | Пользователь PostgreSQL                   | да           | `postgres`                     |
+| `DB__PASSWORD`          | Пароль PostgreSQL                         | да           | —                              |
+| `DB__DATABASE`          | Имя базы данных                           | да           | `taskanline`                   |
+
+Настройки читаются через Pydantic Settings с разделителем `__` для вложенных групп (`CORE__*` → `settings.core`, `DB__*` → `settings.db`).
+
+Сгенерировать JWT-секрет:
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+## Миграции базы данных
+
+```bash
+# Применить все миграции
+uv run alembic upgrade head
+
+# Создать новую миграцию (после изменения моделей)
+uv run alembic revision --autogenerate -m "краткое описание"
+
+# Применить созданную миграцию
+uv run alembic upgrade head
+
+# Откатить последнюю миграцию
+uv run alembic downgrade -1
+
+# Посмотреть текущее состояние
+uv run alembic current
+```
+
+Alembic настроен в `alembic.ini` и `migrations/env.py`. URL базы данных берётся автоматически из `settings.db.url()`. Все модели импортируются в `migrations/env.py` через `src.models.*` — не забывайте добавлять новые модели туда же.
+
+## Проверка работоспособности
+
+```bash
+# Корневой эндпоинт — должен вернуть {"message": "Hello World"}
+curl http://localhost:8000/
+
+# Swagger UI
+open http://localhost:8000/docs
+
+# Состояние Docker-контейнера
+docker ps
+docker logs some-backend-taskanline
+```
+
+## Типичные проблемы
+
+**`connection refused` к PostgreSQL**
+- Убедитесь, что PostgreSQL запущен: `systemctl status postgresql`
+- Проверьте параметры `DB__*` в `.env`
+
+**`ModuleNotFoundError` при запуске**
+- Запускайте через `uv run src/main.py`, а не напрямую `python src/main.py`
+- Или активируйте виртуальное окружение: `source .venv/bin/activate`
+
+**Порт 8000 уже занят**
+```bash
+lsof -i :8000
+# Поменять порт: CORE__PORT=8001 в .env
+```
+
+**Ошибки автогенерации миграций Alembic**
+- Проверьте, что новая модель импортирована в `migrations/env.py`
+- Проверьте подключение: `uv run alembic current`
